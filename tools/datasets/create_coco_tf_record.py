@@ -162,9 +162,15 @@ def create_tf_example(image,
       area.append(object_annotations['area'])
 
       if include_masks:
-        run_len_encoding = mask.frPyObjects(object_annotations['segmentation'],
+        # the fashionpedia dataset use compressed rle code, so we don't need to compress it here
+        if isinstance(object_annotations['segmentation'], dict) and 'counts'in object_annotations['segmentation'] and 'size' in object_annotations['segmentation']:
+          run_len_encoding = [object_annotations['segmentation']]
+        else:
+          run_len_encoding = mask.frPyObjects(object_annotations['segmentation'],
                                             image_height, image_width)
+        #print(run_len_encoding)
         binary_mask = mask.decode(run_len_encoding)
+
         if not object_annotations['iscrowd']:
           binary_mask = np.amax(binary_mask, axis=2)
         pil_image = PIL.Image.fromarray(binary_mask)
@@ -317,8 +323,20 @@ def _create_tf_record_from_coco_annotations(images_info_file,
     else:
       return None
 
+  ########
+  #my_args = [(image, image_dir, _get_object_annotation(image['id']),
+  #                category_index, _get_caption_annotation(image['id']),
+  #                include_masks) for image in images]
+  #for i,one_arg in enumerate(my_args):
+  #  print('process', i)
+  #  #print('args:', one_arg)
+  #  out = _pool_create_tf_example(one_arg)
+  ####
   pool = multiprocessing.Pool()
+  #pool = multiprocessing.Pool(1)
   total_num_annotations_skipped = 0
+
+
   for idx, (_, tf_example, num_annotations_skipped) in enumerate(
       pool.imap(_pool_create_tf_example,
                 [(image, image_dir, _get_object_annotation(image['id']),

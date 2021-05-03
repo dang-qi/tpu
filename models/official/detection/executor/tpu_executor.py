@@ -27,6 +27,8 @@ from absl import logging
 import numpy as np
 import six
 import tensorflow.compat.v1 as tf
+from tensorflow.compat.v1 import ConfigProto
+
 
 from evaluation import coco_utils
 from evaluation import factory
@@ -135,8 +137,11 @@ class TpuExecutor(object):
       devices = ['device:GPU:{}'.format(i) for i in range(len(gpu_devices))]
       strategy = tf.distribute.MirroredStrategy(devices=devices)
       tf.logging.info('Number of devices: %s', strategy.num_replicas_in_sync)
+      session_config = ConfigProto(allow_soft_placement=True)
+      session_config.gpu_options.allow_growth = True
+      #session_config.allow_soft_placement = True
       run_config = tf.estimator.RunConfig(
-          train_distribute=strategy, model_dir=params.model_dir)
+          train_distribute=strategy, model_dir=params.model_dir, session_config=session_config)
       self._estimator = tf.estimator.Estimator(
           model_fn=model_fn, config=run_config, params=model_params)
 

@@ -16,6 +16,7 @@
 
 # pylint: disable=line-too-long
 REGULARIZATION_VAR_REGEX = r'.*(kernel|weight):0$'
+SCALE = 32
 BASE_CFG = {
     'model_dir': '',
     'use_tpu': True,
@@ -34,8 +35,8 @@ BASE_CFG = {
     },
     'train': {
         'iterations_per_loop': 100,
-        'train_batch_size': 64,
-        'total_steps': 22500,
+        'train_batch_size': 64//SCALE,
+        'total_steps': 22500*SCALE,
         'num_cores_per_replica': None,
         'input_partition_dims': None,
         'optimizer': {
@@ -44,11 +45,11 @@ BASE_CFG = {
         },
         'learning_rate': {
             'type': 'step',
-            'warmup_learning_rate': 0.0067,
+            'warmup_learning_rate': 0.0067/SCALE,
             'warmup_steps': 500,
-            'init_learning_rate': 0.08,
-            'learning_rate_levels': [0.008, 0.0008],
-            'learning_rate_steps': [15000, 20000],
+            'init_learning_rate': 0.08/SCALE,
+            'learning_rate_levels': [0.008/SCALE, 0.0008/SCALE],
+            'learning_rate_steps': [15000*SCALE, 20000*SCALE],
         },
         'checkpoint': {
             'path': '',
@@ -64,6 +65,38 @@ BASE_CFG = {
         'gradient_clip_norm': 0.0,
         'space_to_depth_block_size': 1,
     },
+    #'train': {
+    #    'iterations_per_loop': 100,
+    #    'train_batch_size': 64,
+    #    'total_steps': 22500,
+    #    'num_cores_per_replica': None,
+    #    'input_partition_dims': None,
+    #    'optimizer': {
+    #        'type': 'momentum',
+    #        'momentum': 0.9,
+    #    },
+    #    'learning_rate': {
+    #        'type': 'step',
+    #        'warmup_learning_rate': 0.0067,
+    #        'warmup_steps': 500,
+    #        'init_learning_rate': 0.08,
+    #        'learning_rate_levels': [0.008, 0.0008],
+    #        'learning_rate_steps': [15000, 20000],
+    #    },
+    #    'checkpoint': {
+    #        'path': '',
+    #        'prefix': '',
+    #        'skip_variables_regex': '',
+    #    },
+    #    'frozen_variable_prefix': None,
+    #    'train_file_pattern': '',
+    #    'train_dataset_type': 'tfrecord',
+    #    'transpose_input': True,
+    #    'regularization_variable_regex': REGULARIZATION_VAR_REGEX,
+    #    'l2_weight_decay': 0.0001,
+    #    'gradient_clip_norm': 0.0,
+    #    'space_to_depth_block_size': 1,
+    #},
     'eval': {
         'eval_batch_size': 8,
         'eval_samples': 5000,

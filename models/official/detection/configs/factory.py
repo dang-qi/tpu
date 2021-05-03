@@ -15,7 +15,7 @@
 """Factory to provide model configs."""
 
 from configs import classification_config
-from configs import maskrcnn_config
+from configs import maskrcnn_fashionpedia_config as maskrcnn_config
 from configs import retinanet_config
 from configs import segmentation_config
 from configs import shapemask_config
