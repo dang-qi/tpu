@@ -102,7 +102,7 @@ BASE_CFG = {
         'eval_samples': 5000,
         'min_eval_interval': 180,
         'eval_timeout': None,
-        'num_steps_per_eval': 1000,
+        'num_steps_per_eval': 1000*SCALE,
         'eval_file_pattern': '',
         'eval_dataset_type': 'tfrecord',
         'skip_eval_loss': False,
